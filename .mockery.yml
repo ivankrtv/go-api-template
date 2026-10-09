@@ -1,0 +1,7 @@
+all: true
+dir: "gen/mocks"
+filename: "mock_{{.InterfaceName | lower}}.go"
+recursive: true
+pkgname: '{{.SrcPackageName}}_mock'
+packages:
+  go-api-template/internal/service:

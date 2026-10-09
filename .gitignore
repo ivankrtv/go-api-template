@@ -1,0 +1,4 @@
+/bin
+.env
+.cache/
+.coverage.out

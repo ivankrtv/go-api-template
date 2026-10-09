@@ -1,0 +1,87 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Template",
+    "version": "0.0.0"
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "operationId": "health",
+        "summary": "HealthCheck",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthCheckResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/registration": {
+      "post": {
+        "operationId": "registration",
+        "summary": "Регистрация",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegistrationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegistrationResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "HealthCheckResponse": {
+        "type": "string",
+        "example": "ok"
+      },
+      "RegistrationRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "test@mail.ru"
+          },
+          "password": {
+            "type": "string",
+            "example": "qwerty123"
+          },
+          "username": {
+            "type": "string",
+            "example": "username"
+          }
+        },
+        "required": ["email", "password", "username"]
+      },
+      "RegistrationResponse": {
+        "type": "object",
+        "properties": {
+          "authToken": {
+            "type": "string",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30"
+          }
+        }
+      }
+    }
+  }
+}
