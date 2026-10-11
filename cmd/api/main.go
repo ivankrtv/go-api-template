@@ -7,6 +7,8 @@ import (
 	"go-api-template/internal/config"
 	"log"
 	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/gofiber/contrib/fiberzerolog"
 	"github.com/gofiber/fiber/v2"
@@ -43,7 +45,21 @@ func main() {
 
 	transport.RegisterHandlers(server, h)
 
-	if err := server.Listen(":8080"); err != nil {
-		log.Fatalf("fail start server: %s", err.Error())
+	go func() {
+		if err := server.Listen(":8080"); err != nil {
+			log.Fatalf("fail start server: %s", err.Error())
+		}
+	}()
+
+	// Wait for interrupt signal
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+
+	err = server.Shutdown()
+	if err != nil {
+		log.Fatalf("Server shutdown failed: %v", err)
 	}
+
+	application.Close()
 }
