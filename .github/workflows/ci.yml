@@ -7,9 +7,6 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-#      - name: Setup docker
-#        uses: docker/setup-docker-action@v5
-
       - name: Checkout repo
         uses: actions/checkout@v7
 
@@ -23,14 +20,21 @@ jobs:
         uses: actions/setup-go@v7
         with:
           go-version: "1.26"
+
+      - name: Checkout repo
+        uses: actions/checkout@v7
+
       - name: Build
         run: go build -v ./...
 
   tests:
     runs-on: ubuntu-latest
     steps:
-#      - name: Setup docker
-#        uses: docker/setup-docker-action@v5
+      - name: Setup docker
+        uses: docker/setup-docker-action@v5
+
+      - name: Setup docker compose
+        uses: docker/setup-compose-action@v2
 
       - name: Checkout repo
         uses: actions/checkout@v7
