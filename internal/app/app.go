@@ -54,11 +54,15 @@ func (a *App) UpMigrations() error {
 	}
 
 	db := stdlib.OpenDBFromPool(a.db.Primary)
-	defer db.Close()
+	defer db.Close() //nolint:errcheck //defer
 
 	if err := goose.Up(db, "."); err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func (a *App) Close() {
+	a.db.Close()
 }

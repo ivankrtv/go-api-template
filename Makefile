@@ -32,11 +32,11 @@ all_tests:
 	set -a \
 	. ./deploy/test/.env.test \
 	set +a
-	docker-compose -f deploy/test/docker-compose.yaml -p $(SERVICE_NAME)_test down
-	docker-compose -f deploy/test/docker-compose.yaml -p $(SERVICE_NAME)_test up -d
+	docker compose -f deploy/test/docker-compose.yaml -p $(SERVICE_NAME)_test down
+	docker compose -f deploy/test/docker-compose.yaml -p $(SERVICE_NAME)_test up -d
 	go clean --testcache
 	go test -v -race $$(go list ./internal/service/... | grep -v test) -coverprofile=".coverage.out"
-	docker-compose -f deploy/test/docker-compose.yaml -p $(SERVICE_NAME)_test down
+	docker compose -f deploy/test/docker-compose.yaml -p $(SERVICE_NAME)_test down
 
 # Infrastructure
 infra_up:

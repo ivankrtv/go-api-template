@@ -20,7 +20,7 @@ func InternalServerError(c *fiber.Ctx, err error) HttpError {
 		Error: "Internal server error",
 	}
 
-	c.Status(http.StatusInternalServerError).JSON(httpErr)
+	c.Status(http.StatusInternalServerError).JSON(httpErr) //nolint:errcheck
 
 	return httpErr
 }
@@ -31,7 +31,7 @@ func BadRequestError(c *fiber.Ctx, err error) HttpError {
 		Error: err.Error(),
 	}
 
-	c.Status(http.StatusBadRequest).JSON(httpErr)
+	c.Status(http.StatusBadRequest).JSON(httpErr) //nolint:errcheck
 
-	return HttpError{}
+	return httpErr
 }
