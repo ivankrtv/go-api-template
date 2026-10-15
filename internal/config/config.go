@@ -7,7 +7,8 @@ type Database struct {
 	ReplicaDSN string `env:"DATABASE_REPLICA_DSN,required,notEmpty"`
 }
 type Config struct {
-	Database Database
+	ServiceName string `env:"SERVICE_NAME" envDefault:"service"`
+	Database    Database
 }
 
 func InitConfig() (Config, error) {
