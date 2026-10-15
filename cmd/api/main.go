@@ -5,6 +5,7 @@ import (
 	transport "go-api-template/gen/oapi"
 	"go-api-template/internal/app"
 	"go-api-template/internal/config"
+	"go-api-template/internal/metrics"
 	"log"
 	"os"
 	"os/signal"
@@ -42,6 +43,8 @@ func main() {
 	server.Use(fiberzerolog.New(fiberzerolog.Config{
 		Logger: &logger,
 	}))
+
+	server.Use("/metrics", metrics.NewMetricsMiddleware(cfg.ServiceName))
 
 	transport.RegisterHandlers(server, h)
 

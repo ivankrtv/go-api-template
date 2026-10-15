@@ -1,19 +1,14 @@
 SERVICE_NAME=template
 
-GOBIN=$(shell pwd)/bin
-
 GOLANGCI_LINT_VERSION=v2.14-alpine
 
 GOCACHE_HOST := $(CURDIR)/.cache/go-build
 GOLANGCI_CACHE_HOST := $(CURDIR)/.cache/golangci-lint
 
-install-bin:
-	GOBIN=$(GOBIN) go install github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@latest
-
 # Generators
 generate_oapi:
-	$(GOBIN)/oapi-codegen -config=./internal/config/oapi-server-config.yaml docs/openapi.json
-	$(GOBIN)/oapi-codegen -config=./internal/config/oapi-types-config.yaml docs/openapi.json
+	go tool oapi-codegen -config=./internal/config/oapi-server-config.yaml docs/openapi.json
+	go tool oapi-codegen -config=./internal/config/oapi-types-config.yaml docs/openapi.json
 
 generate_mocks:
 	docker run --rm -v $(CURDIR):/src -w /src vektra/mockery:3

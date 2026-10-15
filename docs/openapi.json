@@ -25,7 +25,7 @@
     "/registration": {
       "post": {
         "operationId": "registration",
-        "summary": "Регистрация",
+        "summary": "Registration",
         "requestBody": {
           "content": {
             "application/json": {
