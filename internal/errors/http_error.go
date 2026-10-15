@@ -35,3 +35,14 @@ func BadRequestError(c *fiber.Ctx, err error) HttpError {
 
 	return httpErr
 }
+
+func UnprocessableEntity(c *fiber.Ctx, err error) HttpError {
+	httpErr := HttpError{
+		Type:  "Unprocessable entity",
+		Error: err.Error(),
+	}
+
+	c.Status(http.StatusUnprocessableEntity).JSON(httpErr) //nolint:errcheck
+
+	return httpErr
+}

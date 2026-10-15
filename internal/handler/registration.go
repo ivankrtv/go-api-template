@@ -1,9 +1,9 @@
 package handler
 
 import (
-	"errors"
 	transport "go-api-template/gen/oapi"
 	httpErrors "go-api-template/internal/errors"
+	"go-api-template/internal/validator"
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
@@ -13,11 +13,13 @@ func (h *Handler) Registration(c *fiber.Ctx) error {
 	var request transport.RegistrationRequest
 	err := c.BodyParser(&request)
 	if err != nil {
-		if errors.Is(err, fiber.ErrUnprocessableEntity) {
-			httpErrors.BadRequestError(c, errors.New("empty_request"))
-			return nil
-		}
-		httpErrors.InternalServerError(c, err)
+		httpErrors.UnprocessableEntity(c, err)
+		return nil
+	}
+
+	err = validator.ValidateRegistration(request)
+	if err != nil {
+		httpErrors.BadRequestError(c, err)
 		return nil
 	}
 
