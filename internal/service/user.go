@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"go-api-template/internal/domain/user"
+
+	"github.com/rs/zerolog/log"
 )
 
 type UserService struct {
@@ -21,6 +23,10 @@ func (s *UserService) Registration(
 	password string,
 	username string,
 ) (user.User, error) {
+	l := log.With().Any("request_id", ctx.Value("X-Request-ID")).Logger()
+
+	l.Info().Msg("test")
+
 	email := user.Email(emailAsString)
 	isEmailValid := email.Validate()
 
@@ -35,6 +41,7 @@ func (s *UserService) Registration(
 		if errors.Is(err, user.ErrEmailAlreadyTaken) {
 			return user.User{}, err
 		}
+		l.Error().Err(err).Msg("fail to save user")
 		return user.User{}, fmt.Errorf("fail to save user: %w", err)
 	}
 

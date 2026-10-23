@@ -17,13 +17,15 @@ func (h *Handler) Registration(c *fiber.Ctx) error {
 		return nil
 	}
 
+	ctx := c.UserContext()
+
 	err = validator.ValidateRegistration(request)
 	if err != nil {
 		httpErrors.BadRequestError(c, err)
 		return nil
 	}
 
-	usr, err := h.UserService.Registration(c.Context(), request.Email, request.Password, request.Username)
+	usr, err := h.UserService.Registration(ctx, request.Email, request.Password, request.Username)
 	if err != nil {
 		httpErrors.BadRequestError(c, err)
 		return nil
