@@ -33,7 +33,7 @@ func New(ctx context.Context, cfg config.Config, logger *zerolog.Logger) (*App, 
 	}
 
 	userRepo := repository.NewUserRepository(db)
-	userService := service.NewUserService(userRepo)
+	userService := service.NewUserService(logger, userRepo)
 
 	authService := service.NewAuthService()
 

@@ -9,12 +9,14 @@ import (
 	"testing"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/rs/zerolog"
 )
 
 func initHandler(t *testing.T) *handler.Handler {
+	nopLogger := zerolog.Nop()
 	db := testutils.NewTestDB(t)
 	userRepo := repository.NewUserRepository(db)
-	userService := service.NewUserService(userRepo)
+	userService := service.NewUserService(&nopLogger, userRepo)
 
 	authService := service.NewAuthService()
 

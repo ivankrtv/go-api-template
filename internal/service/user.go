@@ -5,16 +5,21 @@ import (
 	"errors"
 	"fmt"
 	"go-api-template/internal/domain/user"
+	"go-api-template/internal/utils"
 
-	"github.com/rs/zerolog/log"
+	"github.com/rs/zerolog"
 )
 
 type UserService struct {
+	logger     *zerolog.Logger
 	repository UserRepositoryInterface
 }
 
-func NewUserService(repo UserRepositoryInterface) *UserService {
-	return &UserService{repository: repo}
+func NewUserService(logger *zerolog.Logger, repo UserRepositoryInterface) *UserService {
+	return &UserService{
+		logger:     logger,
+		repository: repo,
+	}
 }
 
 func (s *UserService) Registration(
@@ -23,9 +28,7 @@ func (s *UserService) Registration(
 	password string,
 	username string,
 ) (user.User, error) {
-	l := log.With().Any("request_id", ctx.Value("X-Request-ID")).Logger()
-
-	l.Info().Msg("test")
+	l := s.logger.With().Str(utils.RequestID, utils.GetRequestIDFromCtx(ctx)).Logger()
 
 	email := user.Email(emailAsString)
 	isEmailValid := email.Validate()

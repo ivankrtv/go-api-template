@@ -2,19 +2,14 @@ package main
 
 import (
 	"context"
-	"fmt"
 	transport "go-api-template/gen/oapi"
 	"go-api-template/internal/app"
 	"go-api-template/internal/config"
-	"go-api-template/internal/metrics"
+	"go-api-template/internal/utils/logger"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
-
-	"github.com/gofiber/contrib/fiberzerolog"
-	"github.com/gofiber/fiber/v2"
-	"github.com/rs/zerolog"
 )
 
 func main() {
@@ -25,13 +20,12 @@ func main() {
 		log.Fatalf("fail init config: %s", err.Error())
 	}
 
-	logLevel, err := zerolog.ParseLevel(cfg.LogLevel)
+	l, err := logger.InitLogger(cfg.LogLevel)
 	if err != nil {
-		log.Fatalf("invalid log level: %s", err.Error())
+		log.Fatalf("fail init logger: %s", err.Error())
 	}
-	logger := zerolog.New(os.Stderr).Level(logLevel).With().Timestamp().Logger()
 
-	application, err := app.New(ctx, cfg, &logger)
+	application, err := app.New(ctx, cfg, l)
 	if err != nil {
 		log.Fatalf("fail init app: %s", err.Error())
 	}
@@ -43,21 +37,12 @@ func main() {
 
 	h := application.NewHandler()
 
-	server := fiber.New(fiber.Config{
-		AppName: cfg.ServiceName,
-	})
+	server := app.NewServer(&cfg, l)
 
-	server.Use(fiberzerolog.New(fiberzerolog.Config{
-		Logger: &logger,
-	}))
-
-	server.Use("/metrics", metrics.NewMetricsMiddleware(cfg.ServiceName))
-
-	transport.RegisterHandlers(server, h)
+	transport.RegisterHandlers(server.GetRouter(), h)
 
 	go func() {
-		host := fmt.Sprintf(":%d", cfg.HTTPPort)
-		if err := server.Listen(host); err != nil {
+		if err := server.Run(); err != nil {
 			log.Fatalf("fail start server: %s", err.Error())
 		}
 	}()
