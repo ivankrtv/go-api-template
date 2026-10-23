@@ -14,14 +14,14 @@ connectivity, migrations, logging, metrics, validation, linter, tests, and CI.
 | API contract | [OpenAPI](docs/openapi.json), server and models generated with [oapi-codegen](https://github.com/oapi-codegen/oapi-codegen) |
 | PostgreSQL | [pgx/v5](https://github.com/jackc/pgx) + `pgxpool` (separate pools for primary and replica) |
 | Migrations | [goose](https://github.com/pressly/goose) (SQL migrations, embedded into the binary via `embed`) |
-| Logging | [zerolog](https://github.com/rs/zerolog) + `fiberzerolog` middleware |
+| Logging | [zerolog](https://github.com/rs/zerolog) + `fiberzerolog` middleware, level configurable via `LOG_LEVEL` |
 | Metrics | [Prometheus client](https://github.com/prometheus/client_golang), `/metrics` endpoint |
 | Configuration | [caarlos0/env](https://github.com/caarlos0/env) — settings read from environment variables |
 | Validation | [ozzo-validation](https://github.com/go-ozzo/ozzo-validation) |
 | Mocks | [mockery](https://github.com/vektra/mockery) (generated into `gen/mocks`) |
 | Linter | [golangci-lint](https://golangci-lint.run) (runs in Docker) |
 | Tests | `testing` + [testify](https://github.com/stretchr/testify), integration tests use a real Postgres via [pgtestdb](https://github.com/peterldowns/pgtestdb) |
-| Infrastructure | Docker / docker-compose (local DB and test DB) |
+| Infrastructure | Docker / docker-compose (local DB and test DB), multi-stage service image (`deploy/service/api/Dockerfile`) |
 | CI | GitHub Actions: lint, build, tests (`.github/workflows/ci.yml`) |
 
 ## Architecture
@@ -60,7 +60,8 @@ Layer responsibilities:
 - **service** (`internal/service`) — business logic. Independent of HTTP and
   database details: it depends only on repository interfaces and domain
   models. Interfaces consumed by the service are small and defined where they
-  are used (`internal/service/interfaces.go`).
+  are used (`internal/service/interfaces.go`). A logger is injected through
+  the constructor, and log entries are enriched with the request ID.
 - **repository** (`internal/repository`) — data access. Executes SQL via
   `pgx/v5` and maps rows to domain models.
 - **domain** (`internal/domain`) — domain models and package-specific errors,
@@ -71,6 +72,13 @@ Cross-cutting concerns and wiring:
 - **app** (`internal/app`) — the composition root. Explicitly constructs and
   connects all dependencies (repositories → services → handler). No global
   state, no init() magic — everything is passed through constructors.
+- **server** (`internal/app/server.go`) — assembles the Fiber HTTP server and
+  its middleware chain: request ID extraction, request logging (zerolog),
+  metrics collection. Owns `Run` and `Shutdown`, which the entrypoint uses.
+- **request ID** (`internal/utils`) — middleware reads `X-Request-ID` from
+  the incoming request (or generates a UUID) and stores it in the request
+  context; both the access log and service-level logs are then enriched with
+  `request_id`, so all log lines for one request are correlated.
 - **config** (`internal/config`) — configuration from environment variables
   (`caarlos0/env`).
 - **database** (`internal/database`) — two `pgxpool` pools: primary and
@@ -96,7 +104,7 @@ to wire the handler → service → repository layers together.
 ```
 cmd/api/              # entrypoint: config, server startup, graceful shutdown
 internal/
-  app/                # application assembly (DI): repositories → services → handlers
+  app/                # application assembly (DI) and HTTP server wiring
   config/             # env-based config + code generation configs
   database/           # Postgres connectivity (primary/replica pools)
   handler/            # HTTP handlers (implement the generated ServerInterface)
@@ -106,12 +114,14 @@ internal/
   validator/          # request validation
   errors/             # HTTP error helpers
   metrics/            # Prometheus metrics and middleware
+  utils/              # small helpers (logger init, request ID propagation)
   testutils/          # test utilities (test database)
 migrations/           # goose migrations (embedded)
 gen/                  # generated code (oapi-codegen, mocks) — do not edit by hand
 docs/openapi.json     # OpenAPI specification (source of truth for the API)
 deploy/local/         # docker-compose with Postgres for local development
 deploy/test/          # docker-compose + .env for the test database
+deploy/service/api/   # Dockerfile for the service image
 tests/                # integration API tests
 ```
 
@@ -137,7 +147,8 @@ Requirements: Go 1.26+, Docker and docker-compose.
    go run ./cmd/api
    ```
 
-The server starts on `:8080`. Verification:
+The server listens on the port configured via `HTTP_PORT` (8080 in
+`.env.example`). Verification:
 
 ```bash
 curl http://localhost:8080/health
@@ -149,11 +160,22 @@ Stop the infrastructure:
 make infra_down
 ```
 
+### Docker image
+
+The service ships with a multi-stage Dockerfile (compiles a static binary,
+runs as a non-root user). Build it from the repository root:
+
+```bash
+docker build -f deploy/service/api/Dockerfile -t go-api-template .
+```
+
 ## Environment variables
 
 | Variable | Description | Default |
 |---|---|---|
 | `SERVICE_NAME` | service name (used in metrics) | `service` |
+| `HTTP_PORT` | HTTP port the server listens on (required) | — |
+| `LOG_LEVEL` | zerolog level (`trace`, `debug`, `info`, `warn`, `error`, `fatal`) | `info` |
 | `DATABASE_PRIMARY_DSN` | primary DB DSN (required) | — |
 | `DATABASE_REPLICA_DSN` | replica DSN (required) | — |
 
