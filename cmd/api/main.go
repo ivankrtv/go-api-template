@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	transport "go-api-template/gen/oapi"
 	"go-api-template/internal/app"
 	"go-api-template/internal/config"
@@ -24,9 +25,13 @@ func main() {
 		log.Fatalf("fail init config: %s", err.Error())
 	}
 
-	logger := zerolog.New(os.Stderr).With().Timestamp().Logger()
+	logLevel, err := zerolog.ParseLevel(cfg.LogLevel)
+	if err != nil {
+		log.Fatalf("invalid log level: %s", err.Error())
+	}
+	logger := zerolog.New(os.Stderr).Level(logLevel).With().Timestamp().Logger()
 
-	application, err := app.New(ctx, cfg)
+	application, err := app.New(ctx, cfg, &logger)
 	if err != nil {
 		log.Fatalf("fail init app: %s", err.Error())
 	}
@@ -38,7 +43,9 @@ func main() {
 
 	h := application.NewHandler()
 
-	server := fiber.New()
+	server := fiber.New(fiber.Config{
+		AppName: cfg.ServiceName,
+	})
 
 	server.Use(fiberzerolog.New(fiberzerolog.Config{
 		Logger: &logger,
@@ -49,7 +56,8 @@ func main() {
 	transport.RegisterHandlers(server, h)
 
 	go func() {
-		if err := server.Listen(":8080"); err != nil {
+		host := fmt.Sprintf(":%d", cfg.HTTPPort)
+		if err := server.Listen(host); err != nil {
 			log.Fatalf("fail start server: %s", err.Error())
 		}
 	}()

@@ -8,6 +8,8 @@ type Database struct {
 }
 type Config struct {
 	ServiceName string `env:"SERVICE_NAME" envDefault:"service"`
+	HTTPPort    int    `env:"HTTP_PORT,required"`
+	LogLevel    string `env:"LOG_LEVEL" envDefault:"info"`
 	Database    Database
 }
 

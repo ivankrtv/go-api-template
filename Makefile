@@ -45,4 +45,4 @@ test_infra_up:
 	docker-compose -f deploy/test/docker-compose.yaml -p $(SERVICE_NAME)_test --env-file deploy/test/.env.test up -d
 
 test_infra_down:
-	docker-compose -f deploy/local/docker-compose.yaml -p $(SERVICE_NAME)_test down
+	docker-compose -f deploy/test/docker-compose.yaml -p $(SERVICE_NAME)_test down

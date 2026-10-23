@@ -12,10 +12,13 @@ import (
 
 	"github.com/jackc/pgx/v5/stdlib"
 	"github.com/pressly/goose/v3"
+	"github.com/rs/zerolog"
 )
 
 type App struct {
 	db *database.DB
+
+	logger *zerolog.Logger
 
 	userService *service.UserService
 	authService *service.AuthService
@@ -23,7 +26,7 @@ type App struct {
 	userRepository *repository.UserRepository
 }
 
-func New(ctx context.Context, cfg config.Config) (*App, error) {
+func New(ctx context.Context, cfg config.Config, logger *zerolog.Logger) (*App, error) {
 	db, err := database.NewDB(ctx, cfg.Database)
 	if err != nil {
 		return nil, fmt.Errorf("fail create database: %w", err)
@@ -36,6 +39,7 @@ func New(ctx context.Context, cfg config.Config) (*App, error) {
 
 	return &App{
 		db:             db,
+		logger:         logger,
 		userService:    userService,
 		userRepository: userRepo,
 		authService:    authService,
