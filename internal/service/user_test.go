@@ -6,12 +6,14 @@ import (
 	"go-api-template/internal/domain/user"
 	"testing"
 
+	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 )
 
 func newUserService(t *testing.T) *UserService {
-	return NewUserService(mocks.NewMockUserRepositoryInterface(t))
+	nopLogger := zerolog.Nop()
+	return NewUserService(&nopLogger, mocks.NewMockUserRepositoryInterface(t))
 }
 
 func TestUserService_Registration(t *testing.T) {
