@@ -3,7 +3,7 @@ package handler
 import (
 	"net/http"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v3"
 )
 
 type Handler struct {
@@ -21,7 +21,7 @@ func New(
 	}
 }
 
-func (h *Handler) Health(c *fiber.Ctx) error {
+func (h *Handler) Health(c fiber.Ctx) error {
 	if _, err := c.Status(http.StatusOK).Write([]byte("ok")); err != nil {
 		return err
 	}

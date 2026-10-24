@@ -4,17 +4,17 @@
 package transport
 
 import (
-	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v3"
 )
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 	// Health HealthCheck
 	// (GET /health)
-	Health(c *fiber.Ctx) error
+	Health(c fiber.Ctx) error
 	// Registration Registration
 	// (POST /registration)
-	Registration(c *fiber.Ctx) error
+	Registration(c fiber.Ctx) error
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -24,19 +24,19 @@ type ServerInterfaceWrapper struct {
 }
 
 type MiddlewareFunc fiber.Handler
-type HandlerMiddlewareFunc func(c *fiber.Ctx, next fiber.Handler) error
+type HandlerMiddlewareFunc func(c fiber.Ctx, next fiber.Handler) error
 
 // Health operation middleware
-func (siw *ServerInterfaceWrapper) Health(c *fiber.Ctx) error {
+func (siw *ServerInterfaceWrapper) Health(c fiber.Ctx) error {
 
-	handler := func(c *fiber.Ctx) error {
+	handler := func(c fiber.Ctx) error {
 		return siw.Handler.Health(c)
 	}
 
 	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
 		m := siw.HandlerMiddlewares[i]
 		next := handler
-		handler = func(c *fiber.Ctx) error {
+		handler = func(c fiber.Ctx) error {
 			return m(c, next)
 		}
 	}
@@ -45,16 +45,16 @@ func (siw *ServerInterfaceWrapper) Health(c *fiber.Ctx) error {
 }
 
 // Registration operation middleware
-func (siw *ServerInterfaceWrapper) Registration(c *fiber.Ctx) error {
+func (siw *ServerInterfaceWrapper) Registration(c fiber.Ctx) error {
 
-	handler := func(c *fiber.Ctx) error {
+	handler := func(c fiber.Ctx) error {
 		return siw.Handler.Registration(c)
 	}
 
 	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
 		m := siw.HandlerMiddlewares[i]
 		next := handler
-		handler = func(c *fiber.Ctx) error {
+		handler = func(c fiber.Ctx) error {
 			return m(c, next)
 		}
 	}
