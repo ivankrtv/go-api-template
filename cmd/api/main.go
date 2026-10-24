@@ -56,15 +56,15 @@ func main() {
 		}
 	}()
 
-	// Wait for interrupt signal
-	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
-	<-quit
-
 	err = server.Shutdown()
 	if err != nil {
 		log.Fatalf("Server shutdown failed: %v", err)
 	}
+
+	// Wait for interrupt signal
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
 
 	application.Close()
 }

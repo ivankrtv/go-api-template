@@ -4,7 +4,7 @@ import (
 	"go-api-template/internal/utils"
 	"net/http"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v3"
 	"github.com/rs/zerolog/log"
 )
 
@@ -13,8 +13,8 @@ type HttpError struct {
 	Type  string `json:"type"`
 }
 
-func InternalServerError(c *fiber.Ctx, err error) HttpError {
-	requestID := utils.GetRequestIDFromCtx(c.UserContext())
+func InternalServerError(c fiber.Ctx, err error) HttpError {
+	requestID := utils.GetRequestIDFromCtx(c.Context())
 	l := log.With().Timestamp().Str(utils.RequestID, requestID).Logger()
 	l.Error().Err(err).Msg("Internal server error")
 
@@ -28,7 +28,7 @@ func InternalServerError(c *fiber.Ctx, err error) HttpError {
 	return httpErr
 }
 
-func BadRequestError(c *fiber.Ctx, err error) HttpError {
+func BadRequestError(c fiber.Ctx, err error) HttpError {
 	httpErr := HttpError{
 		Type:  "Bad request",
 		Error: err.Error(),
@@ -39,7 +39,7 @@ func BadRequestError(c *fiber.Ctx, err error) HttpError {
 	return httpErr
 }
 
-func UnprocessableEntity(c *fiber.Ctx, err error) HttpError {
+func UnprocessableEntity(c fiber.Ctx, err error) HttpError {
 	httpErr := HttpError{
 		Type:  "Unprocessable entity",
 		Error: err.Error(),

@@ -6,18 +6,18 @@ import (
 	"go-api-template/internal/validator"
 	"net/http"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v3"
 )
 
-func (h *Handler) Registration(c *fiber.Ctx) error {
+func (h *Handler) Registration(c fiber.Ctx) error {
 	var request transport.RegistrationRequest
-	err := c.BodyParser(&request)
+	err := c.Bind().Body(&request)
 	if err != nil {
 		httpErrors.UnprocessableEntity(c, err)
 		return nil
 	}
 
-	ctx := c.UserContext()
+	ctx := c.Context()
 
 	err = validator.ValidateRegistration(request)
 	if err != nil {

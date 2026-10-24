@@ -7,8 +7,8 @@ import (
 	"go-api-template/internal/metrics"
 	"go-api-template/internal/utils"
 
-	"github.com/gofiber/contrib/fiberzerolog"
-	"github.com/gofiber/fiber/v2"
+	fiberzerolog "github.com/gofiber/contrib/v3/zerolog"
+	"github.com/gofiber/fiber/v3"
 	"github.com/google/uuid"
 	"github.com/rs/zerolog"
 )
@@ -24,22 +24,23 @@ func NewServer(cfg *config.Config, logger *zerolog.Logger) *Server {
 		AppName: cfg.ServiceName,
 	})
 
-	srv.Use(func(c *fiber.Ctx) error {
+	srv.Use(func(c fiber.Ctx) error {
 		requestID := c.Get(utils.HTTPRequestID)
 		if requestID == "" {
 			requestID = uuid.New().String()
 		}
 
-		c.SetUserContext(context.WithValue(c.UserContext(), utils.RequestIDCtxKey, requestID))
+		c.SetContext(context.WithValue(c.Context(), utils.RequestIDCtxKey, requestID))
 
 		return c.Next()
 	})
 
 	srv.Use(fiberzerolog.New(fiberzerolog.Config{
-		GetLogger: func(c *fiber.Ctx) zerolog.Logger {
-			requestID := c.UserContext().Value(utils.RequestIDCtxKey)
+		GetLogger: func(c fiber.Ctx) zerolog.Logger {
+			requestID := c.Context().Value(utils.RequestIDCtxKey)
 			return logger.With().Any(utils.RequestID, requestID).Logger()
 		},
+		Levels: []zerolog.Level{zerolog.InfoLevel, zerolog.ErrorLevel},
 	}))
 
 	srv.Use("/metrics", metrics.NewMetricsMiddleware(cfg.ServiceName))
