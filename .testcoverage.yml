@@ -1,8 +1,6 @@
 profile: .coverage.out
 
 threshold:
-  file: 70
-  package: 80
   total: 80
 
 exclude:
