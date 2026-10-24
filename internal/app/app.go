@@ -35,7 +35,8 @@ func New(ctx context.Context, cfg config.Config, logger *zerolog.Logger) (*App, 
 	userRepo := repository.NewUserRepository(db)
 	userService := service.NewUserService(logger, userRepo)
 
-	authService := service.NewAuthService()
+	authRepo := repository.NewAuthRepository(db)
+	authService := service.NewAuthService(&cfg.Auth, authRepo)
 
 	return &App{
 		db:             db,

@@ -8,6 +8,15 @@ CREATE TABLE "user" (
     created_at TIMESTAMP NOT NULL DEFAULT now(),
     CONSTRAINT uq_email UNIQUE (email)
 );
+
+CREATE TABLE token (
+    id uuid PRIMARY KEY,
+    user_id uuid NOT NULL,
+    access_token TEXT NOT NULL,
+    access_token_expires_at TIMESTAMP NOT NULL,
+    refresh_token TEXT NOT NULL,
+    refresh_token_expires_at TIMESTAMP NOT NULL
+);
 -- +goose StatementEnd
 
 -- +goose Down

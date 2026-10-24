@@ -10,10 +10,19 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
 	ctx := context.Background()
+
+	if os.Getenv("ENVIRONMENT_NAME") == "" {
+		err := godotenv.Load()
+		if err != nil {
+			log.Fatalf("fail parse environment vars from .env")
+		}
+	}
 
 	cfg, err := config.InitConfig()
 	if err != nil {

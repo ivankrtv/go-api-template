@@ -12,7 +12,7 @@ type ServerInterface interface {
 	// Health HealthCheck
 	// (GET /health)
 	Health(c *fiber.Ctx) error
-	// Registration Регистрация
+	// Registration Registration
 	// (POST /registration)
 	Registration(c *fiber.Ctx) error
 }

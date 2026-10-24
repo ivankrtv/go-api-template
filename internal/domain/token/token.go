@@ -1,10 +1,20 @@
 package token
 
-import "time"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
+
+type User struct {
+	ID uuid.UUID
+}
 
 type AuthTokenPair struct {
-	AuthToken             string
-	AuthTokenExpiredAt    time.Time
+	ID                    uuid.UUID
+	AccessToken           string
+	AccessTokenExpiredAt  time.Time
 	RefreshToken          string
 	RefreshTokenExpiredAt time.Time
+	User                  User
 }

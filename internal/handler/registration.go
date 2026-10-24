@@ -31,14 +31,15 @@ func (h *Handler) Registration(c *fiber.Ctx) error {
 		return nil
 	}
 
-	tokenPair, err := h.AuthService.CreateTokenPair(usr)
+	tokenPair, err := h.AuthService.CreateTokenPair(ctx, usr)
 	if err != nil {
 		httpErrors.InternalServerError(c, err)
 		return nil
 	}
 
 	resp := transport.RegistrationResponse{
-		AuthToken: &tokenPair.AuthToken,
+		AuthToken:    tokenPair.AccessToken,
+		RefreshToken: tokenPair.RefreshToken,
 	}
 	if err = c.Status(http.StatusOK).JSON(resp); err != nil {
 		return err
