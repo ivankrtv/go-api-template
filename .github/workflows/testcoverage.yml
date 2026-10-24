@@ -1,7 +1,0 @@
-name: testcoverage.yml
-on:
-  pull_request:
-    branches: [ main ]
-
-jobs:
-

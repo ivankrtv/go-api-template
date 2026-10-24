@@ -10,11 +10,11 @@ connectivity, migrations, logging, metrics, validation, linter, tests, and CI.
 | Concern | Tool |
 |---|---|
 | Language | Go 1.26 |
-| HTTP framework | [Fiber v2](https://github.com/gofiber/fiber) |
+| HTTP framework | [Fiber v3](https://github.com/gofiber/fiber) |
 | API contract | [OpenAPI](docs/openapi.json), server and models generated with [oapi-codegen](https://github.com/oapi-codegen/oapi-codegen) |
 | PostgreSQL | [pgx/v5](https://github.com/jackc/pgx) + `pgxpool` (separate pools for primary and replica) |
 | Migrations | [goose](https://github.com/pressly/goose) (SQL migrations, embedded into the binary via `embed`) |
-| Logging | [zerolog](https://github.com/rs/zerolog) + `fiberzerolog` middleware, level configurable via `LOG_LEVEL` |
+| Logging | [zerolog](https://github.com/rs/zerolog) + [zerolog middleware for Fiber](https://github.com/gofiber/contrib), level configurable via `LOG_LEVEL` |
 | Metrics | [Prometheus client](https://github.com/prometheus/client_golang), `/metrics` endpoint |
 | Configuration | [caarlos0/env](https://github.com/caarlos0/env) — settings read from environment variables |
 | Validation | [ozzo-validation](https://github.com/go-ozzo/ozzo-validation) |
