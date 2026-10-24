@@ -1,0 +1,13 @@
+profile: .coverage.out
+
+threshold:
+  file: 70
+  package: 80
+  total: 80
+
+exclude:
+  paths:
+    - ^go-api-template/gen/
+    - ^go-api-template/cmd/
+    - ^go-api-template/migrations/
+    - ^go-api-template/tests/

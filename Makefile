@@ -20,8 +20,10 @@ lint:
 		-v $(GOLANGCI_CACHE_HOST):/root/.cache/golangci-lint \
 		golangci/golangci-lint:$(GOLANGCI_LINT_VERSION) golangci-lint run
 
+EXCLUDE_TEST_DIRS := test|cmd|gen|docs|deploy|migrations
+
 unit_tests:
-	go test -v -race $$(go list ./internal/service/... | grep -v test) -coverprofile=".coverage.out"
+	go test -v -race $$(go list ./internal/service/... | grep -vE "$(EXCLUDE_TEST_DIRS)") -coverprofile=".coverage.out"
 
 all_tests:
 	set -a \
@@ -30,7 +32,7 @@ all_tests:
 	docker compose -f deploy/test/docker-compose.yaml -p $(SERVICE_NAME)_test down
 	docker compose -f deploy/test/docker-compose.yaml -p $(SERVICE_NAME)_test up -d
 	go clean --testcache
-	go test -v -race $$(go list ./internal/service/... | grep -v test) -coverprofile=".coverage.out"
+	go test -v -race $$(go list ./internal/service/... | grep -vE "$(EXCLUDE_TEST_DIRS)") -coverprofile=".coverage.out"
 	docker compose -f deploy/test/docker-compose.yaml -p $(SERVICE_NAME)_test down
 
 # Infrastructure

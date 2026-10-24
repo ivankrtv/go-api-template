@@ -68,7 +68,7 @@ func (a *AuthService) CreateTokenPair(ctx context.Context, user user.User) (toke
 
 	signedRefreshToken, err := refreshToken.SignedString(signKey)
 	if err != nil {
-		return token.AuthTokenPair{}, fmt.Errorf("fail sign access token: %w", err)
+		return token.AuthTokenPair{}, fmt.Errorf("fail sign refresh token: %w", err)
 	}
 
 	tokenPair := token.AuthTokenPair{
