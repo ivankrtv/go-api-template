@@ -1,10 +1,11 @@
 package errors
 
 import (
-	"log"
+	"go-api-template/internal/utils"
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/rs/zerolog/log"
 )
 
 type HttpError struct {
@@ -13,7 +14,9 @@ type HttpError struct {
 }
 
 func InternalServerError(c *fiber.Ctx, err error) HttpError {
-	log.Printf("Internal error: %s", err.Error())
+	requestID := utils.GetRequestIDFromCtx(c.UserContext())
+	l := log.With().Timestamp().Str(utils.RequestID, requestID).Logger()
+	l.Error().Err(err).Msg("Internal server error")
 
 	httpErr := HttpError{
 		Type:  "internal_server_error",

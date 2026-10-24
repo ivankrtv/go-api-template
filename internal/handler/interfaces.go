@@ -11,5 +11,5 @@ type UserService interface {
 }
 
 type AuthService interface {
-	CreateTokenPair(user user.User) (token.AuthTokenPair, error)
+	CreateTokenPair(ctx context.Context, user user.User) (token.AuthTokenPair, error)
 }

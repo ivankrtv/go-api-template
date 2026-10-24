@@ -21,7 +21,10 @@ type RegistrationRequest struct {
 // RegistrationResponse defines model for RegistrationResponse.
 type RegistrationResponse struct {
 	// AuthToken Example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30
-	AuthToken *string `json:"authToken,omitempty"`
+	AuthToken string `json:"authToken"`
+
+	// RefreshToken Example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30
+	RefreshToken string `json:"refreshToken"`
 }
 
 // RegistrationJSONRequestBody defines body for Registration for application/json ContentType.
